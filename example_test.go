@@ -7,6 +7,144 @@ import (
 	"github.com/tomasbasham/gofp"
 )
 
+func ExampleEither_Map() {
+	e := gofp.Right[int]("hello")
+	doubled := e.Map(func(s string) string { return s + s })
+	value := doubled.Unwrap()
+	fmt.Println(value)
+	// Output:
+	// hellohello
+}
+
+func ExampleEither_FlatMap() {
+	e := gofp.Right[int]("hello")
+	doubled := e.FlatMap(func(s string) gofp.Either[int, string] {
+		return gofp.Right[int](s + s)
+	})
+	value := doubled.Unwrap()
+	fmt.Println(value)
+	// Output:
+	// hellohello
+}
+
+func ExampleEither_FlatMapLeft() {
+	e := gofp.Left[int, string](5)
+	doubled := e.FlatMapLeft(func(x int) gofp.Either[int, string] {
+		return gofp.Left[int, string](x * 2)
+	})
+	value := doubled.UnwrapLeft()
+	fmt.Println(value)
+	// Output:
+	// 10
+}
+
+func ExampleLeft() {
+	e := gofp.Left[int, string](5)
+	value := e.UnwrapLeft()
+	fmt.Println(value)
+	// Output:
+	// 5
+}
+
+func ExampleRight() {
+	e := gofp.Right[int]("hello")
+	value := e.Unwrap()
+	fmt.Println(value)
+	// Output:
+	// hello
+}
+
+func ExampleFromResult() {
+	r := gofp.Ok(5)
+	e := gofp.FromResult(r)
+	value := e.Unwrap()
+	fmt.Println(value)
+	// Output:
+	// 5
+}
+
+func ExampleEitherMap() {
+	e := gofp.Right[int]("hello")
+	doubled := gofp.EitherMap(e, func(s string) string { return s + s })
+	value := doubled.Unwrap()
+	fmt.Println(value)
+	// Output:
+	// hellohello
+}
+
+func ExampleEitherMapLeft() {
+	e := gofp.Left[int, string](5)
+	doubled := gofp.EitherMapLeft(e, func(x int) int { return x * 2 })
+	value := doubled.UnwrapLeft()
+	fmt.Println(value)
+	// Output:
+	// 10
+}
+
+func ExampleEitherApply() {
+	e := gofp.Right[int](5)
+	double := gofp.Right[int](func(x int) int { return x * 2 })
+	value := gofp.EitherApply(e, double).Unwrap()
+	fmt.Println(value)
+	// Output:
+	// 10
+}
+
+func ExampleEitherApplyMap() {
+	e1 := gofp.Left[string, int]("error1")
+	e2 := gofp.Left[string, func(int) int]("error2")
+	combined := gofp.EitherApplyMap(e1, e2, func(a, b string) string {
+		return b + "; " + a
+	})
+	value := combined.UnwrapLeft()
+	fmt.Println(value)
+	// Output:
+	// error1; error2
+}
+
+func ExampleEitherFlatMap() {
+	e := gofp.Right[int]("hello")
+	doubled := gofp.EitherFlatMap(e, func(s string) gofp.Either[int, string] {
+		return gofp.Right[int](s + s)
+	})
+	value := doubled.Unwrap()
+	fmt.Println(value)
+	// Output:
+	// hellohello
+}
+
+func ExampleEitherFlatMapLeft() {
+	e := gofp.Left[int, string](5)
+	parseInt := gofp.EitherFlatMapLeft(e, func(x int) gofp.Either[string, string] {
+		return gofp.Left[string, string](fmt.Sprintf("%d", x))
+	})
+	value := parseInt.UnwrapLeft()
+	fmt.Println(value)
+	// Output:
+	// 5
+}
+
+func ExampleEitherSequence() {
+	eithers := []gofp.Either[string, int]{gofp.Right[string](1), gofp.Right[string](2), gofp.Right[string](3)}
+	sequenced := gofp.EitherSequence(eithers)
+	values := sequenced.Unwrap()
+	fmt.Println(values)
+	// Output:
+	// [1 2 3]
+}
+
+func ExampleEitherFold() {
+	e := gofp.Right[int]("hello")
+	value := gofp.EitherFold(
+		e,
+		func(left int) string { return fmt.Sprintf("Left: %d", left) },
+		func(right string) string { return "Right: " + right },
+	)
+	fmt.Println(value)
+	// Output:
+	// Right: hello
+}
+
 func ExampleOption_Map() {
 	o := gofp.Some(5)
 	doubled := o.Map(func(x int) int { return x * 2 })
