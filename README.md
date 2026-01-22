@@ -1,4 +1,4 @@
-# gofp
+# gofp [![test](https://github.com/tomasbasham/gofp/actions/workflows/test.yaml/badge.svg?event=push)](https://github.com/tomasbasham/gofp/actions/workflows/test.yaml)
 
 A Go module providing monadic structures for functional programming patterns. It
 offers type-safe containers for handling optionality, errors, state,
